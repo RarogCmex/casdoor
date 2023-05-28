@@ -20,20 +20,20 @@ type PaymentProvider interface {
 	Pay(providerName string, productName string, payerName string, paymentName string, productDisplayName string, price float64, returnUrl string, notifyUrl string) (string, error)
 	Notify(request *http.Request, body []byte, authorityPublicKey string) (string, string, float64, string, string, error)
 	GetInvoice(paymentName string, personName string, personIdCard string, personEmail string, personPhone string, invoiceType string, invoiceTitle string, invoiceTaxId string) (string, error)
+	GetResponseError(err error) string
 }
 
-func GetPaymentProvider(typ string, appId string, clientSecret string, host string, appCertificate string, appPrivateKey string, authorityPublicKey string, authorityRootPublicKey string, clientId2 string) (PaymentProvider, error) {
+func GetPaymentProvider(typ string, clientId string, clientSecret string, host string, appCertificate string, appPrivateKey string, authorityPublicKey string, authorityRootPublicKey string, clientId2 string) (PaymentProvider, error) {
 	if typ == "Alipay" {
-		newAlipayPaymentProvider, err := NewAlipayPaymentProvider(appId, appCertificate, appPrivateKey, authorityPublicKey, authorityRootPublicKey)
+		newAlipayPaymentProvider, err := NewAlipayPaymentProvider(clientId, appCertificate, appPrivateKey, authorityPublicKey, authorityRootPublicKey)
 		if err != nil {
 			return nil, err
 		}
 		return newAlipayPaymentProvider, nil
 	} else if typ == "GC" {
-		return NewGcPaymentProvider(appId, clientSecret, host), nil
+		return NewGcPaymentProvider(clientId, clientSecret, host), nil
 	} else if typ == "WeChat Pay" {
-		// appId, mchId, mchCertSerialNumber, apiV3Key, privateKey
-		newWechatPaymentProvider, err := NewWechatPaymentProvider(clientId2, appId, appCertificate, clientSecret, appPrivateKey)
+		newWechatPaymentProvider, err := NewWechatPaymentProvider(clientId, clientSecret, clientId2, appCertificate, appPrivateKey)
 		if err != nil {
 			return nil, err
 		}

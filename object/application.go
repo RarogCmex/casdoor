@@ -38,7 +38,7 @@ type Application struct {
 	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
 
 	DisplayName         string          `xorm:"varchar(100)" json:"displayName"`
-	Logo                string          `xorm:"varchar(100)" json:"logo"`
+	Logo                string          `xorm:"varchar(200)" json:"logo"`
 	HomepageUrl         string          `xorm:"varchar(100)" json:"homepageUrl"`
 	Description         string          `xorm:"varchar(100)" json:"description"`
 	Organization        string          `xorm:"varchar(100)" json:"organization"`
@@ -51,6 +51,7 @@ type Application struct {
 	EnableSamlCompress  bool            `json:"enableSamlCompress"`
 	EnableWebAuthn      bool            `json:"enableWebAuthn"`
 	EnableLinkWithEmail bool            `json:"enableLinkWithEmail"`
+	OrgChoiceMode       string          `json:"orgChoiceMode"`
 	SamlReplyUrl        string          `xorm:"varchar(100)" json:"samlReplyUrl"`
 	Providers           []*ProviderItem `xorm:"mediumtext" json:"providers"`
 	SignupItems         []*SignupItem   `xorm:"varchar(1000)" json:"signupItems"`
@@ -145,7 +146,7 @@ func getProviderMap(owner string) map[string]*Provider {
 	m := map[string]*Provider{}
 	for _, provider := range providers {
 		// Get QRCode only once
-		if provider.Type == "WeChat" && provider.DisableSsl == true && provider.Content == "" {
+		if provider.Type == "WeChat" && provider.DisableSsl && provider.Content == "" {
 			provider.Content, _ = idp.GetWechatOfficialAccountQRCode(provider.ClientId2, provider.ClientSecret2)
 			UpdateProvider(provider.Owner+"/"+provider.Name, provider)
 		}
